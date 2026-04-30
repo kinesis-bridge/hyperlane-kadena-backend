@@ -48,7 +48,7 @@ jobs:
 
       - name: Install KDA tool
         run: |
-          ARCHIVE = kda-tool-${KDA_TOOL_VERSION}-${{ runner.image }}".tar.gz
+          ARCHIVE=kda-tool-${KDA_TOOL_VERSION}-${{ runner.name }}".tar.gz
           wget https://github.com/kda-community/kda-tool/releases/download/${KDA_TOOL_VERSION}/$ARCHIVE
           tar xzf $ARCHIVE
           echo "KDA_TOOL_BIN=kda-tool-${KDA_TOOL_VERSION}/kda" >> "$GITHUB_ENV"
