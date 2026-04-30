@@ -41,6 +41,32 @@ jobs:
           cargo build --release --bin relayer
           cargo build --release --bin validator
 
+      - name: Install Kadena proxy dependencies
+        run: |
+          cd hyperlane/typescript/agents/kadena-proxy
+          yarn install
+
+      - name: Prepare Webpack build
+        run: |
+          cd hyperlane/typescript/agents/kadena-proxy
+          cat << EOF > webpack.config.js
+
+          const path = require('path');
+          module.exports = {
+            entry: './src/main.ts',
+            target: 'node',
+            mode: 'production',
+            externals: [],
+            resolve: {
+              extensions: ['.ts', '.js'],
+            },
+            output: {
+              path: path.resolve(__dirname, 'dist'),
+              filename: 'kadena_proxy.js',
+            },
+          };
+          EOF
+
       - name: Prepare artifact
         run: |
           mkdir -p dist/agents
