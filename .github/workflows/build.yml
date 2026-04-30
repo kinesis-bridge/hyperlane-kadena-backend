@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       KDA_TOOL_VERSION: 1.2
@@ -124,7 +124,7 @@ jobs:
           cp *.json dist/config
 
           mkdir dist/tools
-          cp .foundry/bin/cast dist/tools
+          cp ~/.foundry/bin/cast dist/tools
           cp $KDA_TOOL_BIN dist/tools
 
 
