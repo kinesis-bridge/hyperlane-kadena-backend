@@ -8,6 +8,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+  env:
+    KDA_TOOL_VERSION: 1.2
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,6 +45,13 @@ jobs:
 
       - name: Install Foundry
         uses: uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install KDA tool
+        run: |
+          ARCHIVE = kda-tool-${KDA_TOOL_VERSION}-${{ runner.image }}".tar.gz
+          wget https://github.com/kda-community/kda-tool/releases/download/${KDA_TOOL_VERSION}/$ARCHIVE
+          tar xzf $ARCHIVE
+          echo "KDA_TOOL_BIN=kda-tool-${KDA_TOOL_VERSION}/kda" >> "$GITHUB_ENV"
 
       - name: Build Hyperlane agents
         run: |
@@ -115,6 +125,8 @@ jobs:
 
           mkdir dist/tools
           cp .foundry/bin/cast dist/tools
+          cp $KDA_TOOL_BIN dist/tools
+
 
 
       - name: Upload artifact
