@@ -67,6 +67,17 @@ jobs:
           };
           EOF
 
+          tmp=$(mktemp) && \
+          jq '.compilerOptions += {"webpack": true, "webpackConfigPath": "webpack.config.js"}' nest-cli.json > "$tmp"
+          mv "$tmp" nest-cli.json
+
+      - name: Build kadena proxy
+        run: |
+          cd hyperlane/typescript/agents/kadena-proxy
+          yarn run nest build --webpack
+
+
+
       - name: Prepare artifact
         run: |
           mkdir -p dist/agents
@@ -74,7 +85,10 @@ jobs:
           cp hyperlane/rust/target/release/validator dist/agents
 
           strip dist/agents/validator
-          strip dist/agents/reakyer
+          strip dist/agents/relayer
+
+          mkdir -p dist/proxy
+          cp hyperlane/typescript/agents/kadena-proxy/dist/kadena_proxy.js dist/proxy
 
 
       - name: Upload artifact
