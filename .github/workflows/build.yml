@@ -6,7 +6,14 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-22.04
+          - ubuntu-24.04
+
+    runs-on: ${{ matrix.os }}
 
     env:
       KDA_TOOL_VERSION: 1.2
@@ -48,7 +55,7 @@ jobs:
 
       - name: Install KDA tool
         run: |
-          ARCHIVE=kda-tool-${KDA_TOOL_VERSION}-ubuntu-24.04.tar.gz
+          ARCHIVE=kda-tool-${KDA_TOOL_VERSION}-${{ matrix.os }}.tar.gz
           wget https://github.com/kda-community/kda-tool/releases/download/${KDA_TOOL_VERSION}/$ARCHIVE
           tar xzf $ARCHIVE
           echo "KDA_TOOL_BIN=kda-tool-${KDA_TOOL_VERSION}/kda" >> "$GITHUB_ENV"
