@@ -96,6 +96,10 @@ jobs:
           mkdir -p dist/proxy
           cp hyperlane/typescript/agents/kadena-proxy/dist/kadena_proxy.js dist/proxy
 
+          mkdir -p dist/encrypted_keys
+          cp keys/ethereum_operators.json dist/encrypted_keys
+          cp keys/kadena_relayers.yaml.gpg dist/encrypted_keys
+          cp keys/kadena_validators.yaml.gpg dist/encrypted_keys
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
