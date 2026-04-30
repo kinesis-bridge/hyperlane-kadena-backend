@@ -20,7 +20,9 @@ jobs:
           ref: kadena-support-develop
 
       - name: Install tools
-        run: apt-get install -y yq jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yq jq
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
