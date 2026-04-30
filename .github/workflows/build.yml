@@ -1,7 +1,7 @@
 name: Create a complete package for Hyperlane Backed
 on:
   push:
-    branches: ["main"]
+
   workflow_dispatch:
 
 jobs:
