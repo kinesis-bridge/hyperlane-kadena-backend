@@ -1,0 +1,20 @@
+chains:
+  ethereum:
+    rpcUrls:
+      - http: ~
+
+    signer:
+      type: hexKey
+      key: ~
+
+originChainName: ethereum
+
+checkpointsyncer:
+  folder: ~
+
+validator:
+  type: hexKey
+  key: ~
+
+db: ~
+metrics: 9092

@@ -1,0 +1,38 @@
+chains:
+  kadena:
+    name: kadena
+    protocol: kadena
+    domain: 626
+    chainId: 626
+
+    proxyUrl: http://localhost:3000
+
+    namespace: n_e595727b657fbbb3b8e362a05a7bb8d12865c1ff
+
+    # Hash of SC: computed with (compose hash (take 32) modref)
+    mailbox: "0x376E314F336A6F724E6F696F6450676F7A6C7A6D556F59577459376B624D7058"
+    interchainGasPaymaster: "0x69536f746f5a48697a36466a732d5938415932506239364d76616b3642724365"
+    validatorAnnounce: "0x534932426c324a4b434f5f586368576b6f634358416b6c5763694538327a374a"
+    merkleTreeHook: "0x6e54475f325533364136564852684a5579564b74454f32566f43416e46643851"
+
+    index:
+      from: 5500000
+
+  ethereum:
+    name: ethereum
+    protocol: ethereum
+    domain: 1
+    chainId: 1
+
+    mailbox: "0x82A729A4c7B2aeBDdbFCCF533e7B75c61c45c23c"
+    validatorAnnounce: "0xe06ccfFc88f04C3d14355CBD05C85fc238F847Fb"
+    merkleTreeHook: "0xbB7e89E1C475cB02769FfCD8845e5B0B3343ecb7"
+    interchainGasPaymaster: "0x0000000000000000000000000000000000000000"
+
+    index:
+      from: 21636714
+
+checkpointsyncer:
+  type: s3
+  bucket: kadena-hyperlane-sigs-963540390590-us-east-1-an
+  region: us-east-1

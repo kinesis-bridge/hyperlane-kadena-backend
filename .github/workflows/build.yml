@@ -83,6 +83,11 @@ jobs:
           yarn run nest build --webpack
 
 
+      - name: Prepare configs
+        run: |
+          for f in *.yaml
+            do yq '.' "$f" > "${f%.*}.json"
+          done
 
       - name: Prepare artifact
         run: |
@@ -100,6 +105,12 @@ jobs:
           cp keys/ethereum_operators.json dist/encrypted_keys
           cp keys/kadena_relayers.yaml.gpg dist/encrypted_keys
           cp keys/kadena_validators.yaml.gpg dist/encrypted_keys
+
+          cat proxy_config_env > dist/proxy/.env
+
+          mkdir -p dist/config
+          cp *.json dist/config
+
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
