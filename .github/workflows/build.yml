@@ -44,7 +44,7 @@ jobs:
           node-version: 22
 
       - name: Install Foundry
-        uses: uses: foundry-rs/foundry-toolchain@v1
+        uses: foundry-rs/foundry-toolchain@v1
 
       - name: Install KDA tool
         run: |
