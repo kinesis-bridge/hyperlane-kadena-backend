@@ -20,17 +20,17 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout Hyperlane Monorepo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: kinesis-bridge/hyperlane-monorepo-kda-community
           path: hyperlane
           ref: kadena-support-develop
 
       - name: Checkout keys repos
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: kinesis-bridge/kadena-hyperlane-keys
           path: keys
