@@ -19,6 +19,12 @@ jobs:
           path: hyperlane
           ref: kadena-support-develop
 
+      - name: Checkout keys repos
+        uses: actions/checkout@v4
+        with:
+          repository: kinesis-bridge/kadena-hyperlane-keys
+          path: keys
+
       - name: Install tools
         run: |
           sudo apt-get update
