@@ -100,7 +100,7 @@ jobs:
       - name: Prepare configs
         run: |
           for f in *.yaml
-            do yq '.' "$f" > "${f%.*}.json"
+            do yq -o=json '.' "$f" > "${f%.*}.json"
           done
 
       - name: Prepare artifact
