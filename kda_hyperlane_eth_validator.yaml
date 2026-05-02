@@ -1,0 +1,12 @@
+chains:
+  ethereum:
+    rpcUrls:
+      - http: ~
+
+originChainName: ethereum
+
+checkpointsyncer:
+  folder: ~
+
+db: ~/.db/validator_eth
+metrics: 9092

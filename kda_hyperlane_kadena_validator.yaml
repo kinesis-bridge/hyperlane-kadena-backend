@@ -1,22 +1,14 @@
 chains:
   kadena:
-    rpcUrls:
-      - http: ~
-
     accountName: r:n_e595727b657fbbb3b8e362a05a7bb8d12865c1ff.validators
 
-    signer:
-      type: hexKey
-      key: ~
+    rpcUrls:
+      - http: ~
 
 originChainName: kadena
 
 checkpointsyncer:
   folder: ~
 
-validator:
-  type: hexKey
-  key: ~
-
-db: ~
+db: ~/.db/validator_eth
 metrics: 9091
