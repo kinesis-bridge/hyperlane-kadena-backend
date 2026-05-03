@@ -1,0 +1,21 @@
+[Unit]
+Description=Kadena Hyperlane Eth Validator
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+User=validator
+KillMode=process
+KillSignal=SIGINT
+WorkingDirectory=~
+
+# Set-up with your validator name
+Environment=VALIDATOR_NAME=xxxxxx
+
+LoadCredentialEncrypted=eth_secret.json:/etc/hyperlane/eth_secret
+LoadCredentialEncrypted=aws_secret:/etc/hyperlane/aws_secret
+#ExecStart=ls
+ExecStart=/bin/bash start_systemd_eth_validator.sh
+Restart=always
+RestartSec=30
+[Install]
+WantedBy=multi-user.target

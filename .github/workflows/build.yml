@@ -111,6 +111,7 @@ jobs:
           PROXY_DIR=$DIST/proxy
           CONFIG_DIR=$DIST/config
           TOOLS_DIR=$DIST/tools
+          SYSTEMD_DIR=$DIST/systemd
 
           mkdir -p $AGENTS_DIR
           cp hyperlane/rust/target/release/relayer $AGENTS_DIR
@@ -136,6 +137,9 @@ jobs:
           cp ~/.foundry/bin/cast $TOOLS_DIR
           cp $KDA_TOOL_BIN $TOOLS_DIR
 
+          mkdir $SYSTEMD_DIR
+          cp systemd/* $SYSTEMD_DIR
+
       - name: Upload dist artifact
         uses: actions/upload-artifact@v7
         with:
@@ -151,6 +155,12 @@ jobs:
           cp -rf dist $DIST
 
           ## Move the systemd scripts
+          mv $DIST/systemd/start*.sh $DIST
+
+          mkdir -p $DIST/systemd-units
+          mv $DIST/systemd/*.service $DIST/systemd-units
+
+          rm -rf $DIST/systemd
 
           tar czf hyperlane_kadena_systemd_${MATRIX_OS}_${GITHUB_SHA}.tar.gz $DIST/*
 

@@ -1,0 +1,16 @@
+[Unit]
+Description=Kadena Hyperlane Proxy
+After=network.target
+StartLimitIntervalSec=0
+[Service]
+User=validator
+KillMode=process
+KillSignal=SIGINT
+Nice=19
+WorkingDirectory=~
+ExecStart=bash -c "cd ~/proxy && node kadena_proxy.js"
+Restart=always
+RestartSec=30
+[Install]
+WantedBy=multi-user.target
+
