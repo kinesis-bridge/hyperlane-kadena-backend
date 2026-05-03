@@ -162,7 +162,7 @@ jobs:
 
           rm -rf $DIST/systemd
 
-          tar czf hyperlane_kadena_systemd_${MATRIX_OS}_${GITHUB_SHA}.tar.gz $DIST/*
+          tar czf hyperlane_kadena_systemd_${MATRIX_OS}_${GITHUB_SHA}.tar.gz -C $DIST .
 
       - name: Upload Systemd archive
         uses: actions/upload-artifact@v7
