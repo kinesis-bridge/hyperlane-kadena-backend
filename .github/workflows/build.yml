@@ -135,5 +135,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           include-hidden-files: true
-          name: build-${{ matrix.os }}
+          name: build-${{ matrix.os }}-${{github.sha}}
           path: dist/
