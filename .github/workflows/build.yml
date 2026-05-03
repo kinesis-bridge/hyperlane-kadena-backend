@@ -167,7 +167,7 @@ jobs:
           cat proxy_config_env > $PROXY_DIR/.env
 
           mkdir -p $CONFIG_DIR
-          cp *.json $CONFIG_DIR
+          ind source_dir -type f -name '*.json' ! -name 'relayer*.json' -exec cp -t dest_dir {} \;
 
           mkdir $TOOLS_DIR
           cp ~/.foundry/bin/cast $TOOLS_DIR
