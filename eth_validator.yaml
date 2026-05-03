@@ -5,3 +5,4 @@ checkpointsyncer:
 
 db: ~/.db/validator_eth
 metricsport: 9092
+interval: 60
