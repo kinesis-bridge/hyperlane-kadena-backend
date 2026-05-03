@@ -3,6 +3,6 @@ originChainName: ethereum
 checkpointsyncer:
   folder: ~
 
-db: ~/.db/validator_eth
+db: .db/validator_eth
 metricsport: 9092
 interval: 60

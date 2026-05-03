@@ -7,6 +7,6 @@ originChainName: kadena
 checkpointsyncer:
   folder: ~
 
-db: ~/.db/validator_kda
+db: .db/validator_kda
 metricsport: 9091
 interval: 60
