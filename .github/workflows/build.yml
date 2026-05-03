@@ -103,31 +103,38 @@ jobs:
             do yq -o=json '.' "$f" > "${f%.*}.json"
           done
 
-      - name: Prepare artifact
+      - name: Prepare Full artifact
         run: |
-          mkdir -p dist/agents
-          cp hyperlane/rust/target/release/relayer dist/agents
-          cp hyperlane/rust/target/release/validator dist/agents
+          DIST=full-dist
+          AGENTS_DIR=$DIST/agents
+          KEYS_DIR=$DIST/keys
+          PROXY_DIR=$DIST/proxy
+          CONFIG_DIR=$DIST/config
+          TOOLS_DIR=$DIST/tools
 
-          strip dist/agents/validator
-          strip dist/agents/relayer
+          mkdir -p $AGENTS_DIR
+          cp hyperlane/rust/target/release/relayer $AGENTS_DIR
+          cp hyperlane/rust/target/release/validator $AGENTS_DIR
 
-          mkdir -p dist/proxy
-          cp hyperlane/typescript/agents/kadena-proxy/dist/kadena_proxy.js dist/proxy
+          strip $AGENTS_DIR/validator
+          strip $AGENTS_DIR/relayer
 
-          mkdir -p dist/encrypted_keys
-          cp keys/ethereum_operators.json dist/encrypted_keys
-          cp keys/kadena_relayers.yaml.gpg dist/encrypted_keys
-          cp keys/kadena_validators.yaml.gpg dist/encrypted_keys
+          mkdir -p $PROXY_DIR
+          cp hyperlane/typescript/agents/kadena-proxy/dist/kadena_proxy.js $PROXY_DIR
 
-          cat proxy_config_env > dist/proxy/.env
+          mkdir -p $KEYS_DIR
+          cp keys/ethereum_operators.json $KEYS_DIR
+          cp keys/kadena_relayers.yaml.gpg $KEYS_DIR
+          cp keys/kadena_validators.yaml.gpg $KEYS_DIR
 
-          mkdir -p dist/config
-          cp *.json dist/config
+          cat proxy_config_env > $PROXY_DIR/.env
 
-          mkdir dist/tools
-          cp ~/.foundry/bin/cast dist/tools
-          cp $KDA_TOOL_BIN dist/tools
+          mkdir -p $CONFIG_DIR
+          cp *.json $CONFIG_DIR
+
+          mkdir $TOOLS_DIR
+          cp ~/.foundry/bin/cast $TOOLS_DIR
+          cp $KDA_TOOL_BIN $TOOLS_DIR
 
 
 
@@ -137,3 +144,39 @@ jobs:
           include-hidden-files: true
           name: build-${{ matrix.os }}-${{github.sha}}
           path: dist/
+
+      - name: Prepare Systemd - Validator
+        env:
+          MATRIX_OS: ${{ matrix.os }}
+        run: |
+          DIST=hyperlane_kadena_validator
+          AGENTS_DIR=$DIST/agents
+          KEYS_DIR=$DIST/keys
+          PROXY_DIR=$DIST/proxy
+          CONFIG_DIR=$DIST/config
+          TOOLS_DIR=$DIST/tools
+
+          mkdir -p $AGENTS_DIR
+          cp hyperlane/rust/target/release/validator $AGENTS_DIR
+
+          strip $AGENTS_DIR/validator
+
+          mkdir -p $PROXY_DIR
+          cp hyperlane/typescript/agents/kadena-proxy/dist/kadena_proxy.js $PROXY_DIR
+
+          cat proxy_config_env > $PROXY_DIR/.env
+
+          mkdir -p $CONFIG_DIR
+          cp *.json $CONFIG_DIR
+
+          mkdir $TOOLS_DIR
+          cp ~/.foundry/bin/cast $TOOLS_DIR
+          cp $KDA_TOOL_BIN $TOOLS_DIR
+
+          tar czf hyperlane_kadena_validator_systemd_${MATRIX_OS}_${GITHUB_SHA}.tar.gz $DIST/*
+
+      - name: Upload validator Systemd artifact
+        uses: actions/upload-artifact@v7
+        with:
+          include-hidden-files: true
+          path: hyperlane_kadena_validator_systemd_${{ matrix.os }}è${{github.sha}}.tar.gz
