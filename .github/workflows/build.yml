@@ -105,7 +105,7 @@ jobs:
 
       - name: Prepare Full artifact
         run: |
-          DIST=full-dist
+          DIST=dist
           AGENTS_DIR=$DIST/agents
           KEYS_DIR=$DIST/keys
           PROXY_DIR=$DIST/proxy
@@ -136,47 +136,25 @@ jobs:
           cp ~/.foundry/bin/cast $TOOLS_DIR
           cp $KDA_TOOL_BIN $TOOLS_DIR
 
-
-
-      - name: Upload artifact
+      - name: Upload dist artifact
         uses: actions/upload-artifact@v7
         with:
           include-hidden-files: true
           name: build-${{ matrix.os }}-${{github.sha}}
           path: dist/
 
-      - name: Prepare Systemd - Validator
+      - name: Prepare Systemd version
         env:
           MATRIX_OS: ${{ matrix.os }}
         run: |
           DIST=hyperlane_kadena_validator
-          AGENTS_DIR=$DIST/agents
-          KEYS_DIR=$DIST/keys
-          PROXY_DIR=$DIST/proxy
-          CONFIG_DIR=$DIST/config
-          TOOLS_DIR=$DIST/tools
+          cp -rf dist $DIST
 
-          mkdir -p $AGENTS_DIR
-          cp hyperlane/rust/target/release/validator $AGENTS_DIR
+          ## Move the systemd scripts
 
-          strip $AGENTS_DIR/validator
+          tar czf hyperlane_kadena_systemd_${MATRIX_OS}_${GITHUB_SHA}.tar.gz $DIST/*
 
-          mkdir -p $PROXY_DIR
-          cp hyperlane/typescript/agents/kadena-proxy/dist/kadena_proxy.js $PROXY_DIR
-
-          cat proxy_config_env > $PROXY_DIR/.env
-
-          mkdir -p $CONFIG_DIR
-          ind source_dir -type f -name '*.json' ! -name 'relayer*.json' -exec cp -t dest_dir {} \;
-
-          mkdir $TOOLS_DIR
-          cp ~/.foundry/bin/cast $TOOLS_DIR
-          cp $KDA_TOOL_BIN $TOOLS_DIR
-
-          tar czf hyperlane_kadena_validator_systemd_${MATRIX_OS}_${GITHUB_SHA}.tar.gz $DIST/*
-
-      - name: Upload validator Systemd artifact
+      - name: Upload Systemd archive
         uses: actions/upload-artifact@v7
         with:
-          include-hidden-files: true
-          path: hyperlane_kadena_validator_systemd_${{ matrix.os }}è${{github.sha}}.tar.gz
+          path: hyperlane_kadena_systemd_${{ matrix.os }}_${{github.sha}}.tar.gz
