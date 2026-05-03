@@ -158,3 +158,4 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           path: hyperlane_kadena_systemd_${{ matrix.os }}_${{github.sha}}.tar.gz
+          archive: false
