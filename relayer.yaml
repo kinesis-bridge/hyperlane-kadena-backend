@@ -4,5 +4,5 @@ chains:
 
 relaychains: ethereum,kadena
 
-db: ~/.db/relayer
+db: .db/relayer
 metricsport: 9093
