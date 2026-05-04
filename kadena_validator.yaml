@@ -9,4 +9,4 @@ checkpointsyncer:
 
 db: .db/validator_kda
 metricsport: 9091
-interval: 60
+interval: 30
