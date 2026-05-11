@@ -1,0 +1,8 @@
+chains:
+  ethereum:
+    rpcUrls:
+      - http: ~
+
+  kadena:
+    rpcUrls:
+      - http: ~
