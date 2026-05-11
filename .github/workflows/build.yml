@@ -202,7 +202,8 @@ jobs:
 
       - name: Checkout Repository
         uses:  actions/checkout@v6
-        path: src
+        with:
+          path: src
 
       - name: Prepare templates
         run: |
