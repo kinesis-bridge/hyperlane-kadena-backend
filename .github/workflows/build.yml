@@ -179,38 +179,38 @@ jobs:
           path: hyperlane_kadena_systemd_${{ matrix.os }}_${{github.sha}}.tar.gz
           archive: false
 
-release:
-  needs: build
-  if: github.event_name == 'workflow_dispatch' && inputs.create_release == true
+  release:
+    needs: build
+    if: github.event_name == 'workflow_dispatch' && inputs.create_release == true
 
-  runs-on: ubuntu-latest
-  permissions:
-    contents: write
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
-  steps:
-    - name: Create artifacts dir
-      run: |
-        mkdir -p release_artifacts
+    steps:
+      - name: Create artifacts dir
+        run: |
+          mkdir -p release_artifacts
 
 
-    - name: Download Artifacts
-      uses: actions/download-artifact@v8
-      with:
-        pattern: hyperlane_kadena_systemd_*
-        merge-multiple: true
-        path: release_artifacts/
+      - name: Download Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: hyperlane_kadena_systemd_*
+          merge-multiple: true
+          path: release_artifacts/
 
-    - name: Checkout Repository
-      uses:  actions/checkout@v6
+      - name: Checkout Repository
+        uses:  actions/checkout@v6
 
-    - name: Prepare templates
-      run: |
-        for f in *_template.yaml
-            do yq -o=json '.' "$f" > "release_artifacts/${f%.*}.json"
-        done
+      - name: Prepare templates
+        run: |
+          for f in *_template.yaml
+              do yq -o=json '.' "$f" > "release_artifacts/${f%.*}.json"
+          done
 
-    - uses: ncipollo/release-action@v1
-      with:
-        artifacts: "release_artifacts/*"
-        body: "Kadena Systemd Package Release"
-        tag: inputs.release_tag
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "release_artifacts/*"
+          body: "Kadena Systemd Package Release"
+          tag: inputs.release_tag
