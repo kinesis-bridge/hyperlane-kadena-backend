@@ -18,6 +18,9 @@ chains:
     index:
       from: 5500000
 
+    blocks:
+      reorgPeriod: 10
+
   ethereum:
     name: ethereum
     protocol: ethereum
