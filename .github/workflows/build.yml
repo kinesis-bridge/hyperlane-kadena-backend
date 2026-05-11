@@ -216,4 +216,4 @@ jobs:
         with:
           artifacts: "release_artifacts/*"
           body: "Kadena Systemd Package Release"
-          tag: inputs.release_tag
+          tag: ${{inputs.release_tag}}
