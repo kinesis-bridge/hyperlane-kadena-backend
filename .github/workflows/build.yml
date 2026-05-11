@@ -3,6 +3,15 @@ on:
   push:
 
   workflow_dispatch:
+   inputs:
+     create_release:
+       description: "Create a GitHub release"
+       required: true
+       type: boolean
+     release_tag:
+       description: "Release tag (example: v1.0.0)"
+       required: true
+       type: string
 
 jobs:
   build:
@@ -51,7 +60,7 @@ jobs:
       - name: Install KDA tool
         run: |
           ARCHIVE=kda-tool-${KDA_TOOL_VERSION}-${{ matrix.os }}.tar.gz
-          wget https://github.com/kda-community/kda-tool/releases/download/${KDA_TOOL_VERSION}/$ARCHIVE
+          wget -nv https://github.com/kda-community/kda-tool/releases/download/${KDA_TOOL_VERSION}/$ARCHIVE
           tar xzf $ARCHIVE
           echo "KDA_TOOL_BIN=kda-tool-${KDA_TOOL_VERSION}/kda" >> "$GITHUB_ENV"
 
@@ -169,3 +178,39 @@ jobs:
         with:
           path: hyperlane_kadena_systemd_${{ matrix.os }}_${{github.sha}}.tar.gz
           archive: false
+
+release:
+  needs: build
+  if: github.event_name == 'workflow_dispatch' && inputs.create_release == true
+
+  runs-on: ubuntu-latest
+  permissions:
+    contents: write
+
+  steps:
+    - name: Create artifacts dir
+      run: |
+        mkdir -p release_artifacts
+
+
+    - name: Download Artifacts
+      uses: actions/download-artifact@v8
+      with:
+        pattern: hyperlane_kadena_systemd_*
+        merge-multiple: true
+        path: release_artifacts/
+
+    - name: Checkout Repository
+      uses:  actions/checkout@v6
+
+    - name: Prepare templates
+      run: |
+        for f in *_template.yaml
+            do yq -o=json '.' "$f" > "release_artifacts/${f%.*}.json"
+        done
+
+    - uses: ncipollo/release-action@v1
+      with:
+        artifacts: "release_artifacts/*"
+        body: "Kadena Systemd Package Release"
+        tag: inputs.release_tag
