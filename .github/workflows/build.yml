@@ -202,11 +202,13 @@ jobs:
 
       - name: Checkout Repository
         uses:  actions/checkout@v6
+        path: src
 
       - name: Prepare templates
         run: |
-          for f in *_template.yaml
-              do yq -o=json '.' "$f" > "release_artifacts/${f%.*}.json"
+          for f in src/*_template.yaml
+            do base=$(basename "${f%.*}")
+            yq -o=json '.' "$f" > "release_artifacts/${base}.json"
           done
 
       - uses: ncipollo/release-action@v1
