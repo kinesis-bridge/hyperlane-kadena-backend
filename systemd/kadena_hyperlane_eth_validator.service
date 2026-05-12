@@ -4,6 +4,7 @@ After=network.target
 StartLimitIntervalSec=0
 
 [Service]
+Wants=kadena_proxy.service
 User=validator
 KillMode=process
 KillSignal=SIGINT
@@ -19,4 +20,3 @@ RestartSec=30
 
 [Install]
 WantedBy=multi-user.target
-Wants=kadena_proxy.service

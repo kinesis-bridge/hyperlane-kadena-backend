@@ -1,5 +1,6 @@
 [Unit]
-Description=Kadena Hyperlane Eth Validator
+Description=Kadena Hyperlane Kadena Validator
+Wants=kadena_proxy.service
 After=network.target
 StartLimitIntervalSec=0
 [Service]
@@ -18,4 +19,3 @@ RestartSec=30
 
 [Install]
 WantedBy=multi-user.target
-Wants=kadena_proxy.service
