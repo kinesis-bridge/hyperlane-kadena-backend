@@ -48,11 +48,16 @@ shred -u aws_secret.json eth_validator_secret.json kadena_validator_secret.json
 - kadena_hyperlane_kadena_validator.service
 - kadena_proxy.service
 
-6 - Edit unit files to setup correclty the name of the validator
+6 - Create /etc/hyperlance/validator.env
+```
+## Validator name
+VALIDATOR_NAME=my_validator
+```
+
 
 7 - Create /etc/hyperlane/rpcs.json
 
-8 - Laucnh the services... starting with kadena_proxy
+8 - Launch the services... starting with kadena_proxy
 
 
 ## For a Relayer
@@ -86,4 +91,4 @@ shred -u aws_secret.json relayer_secret.json
 
 5 - Create /etc/hyperlane/rpcs.json
 
-6 - Laucnh the services... starting with kadena_proxy
+6 - Launch the services... starting with kadena_proxy

@@ -2,20 +2,20 @@
 Description=Kadena Hyperlane Relayer Service
 After=network.target
 StartLimitIntervalSec=0
+
 [Service]
 User=validator
 KillMode=process
 KillSignal=SIGINT
 WorkingDirectory=~
 
-
 LoadCredentialEncrypted=relayer_secret.json:/etc/hyperlane/relayer_secret
 LoadCredentialEncrypted=aws_secret:/etc/hyperlane/aws_secret
-#ExecStart=ls
+
 ExecStart=/bin/bash start_systemd_relayer.sh
 Restart=always
 RestartSec=30
+
 [Install]
 WantedBy=multi-user.target
 Wants=kadena_proxy.service
-pascal_perso@kadena-dev:~/

@@ -1,6 +1,12 @@
 #!/bin/sh
 
-export CONFIG_FILES="config/kda_hyperlane.json,config/rpcs.json,/etc/hyperlane/rpcs.json,config/relayer.json,$CREDENTIALS_DIRECTORY/relayer_secret.json"
+export CONFIG_FILES="\
+config/kda_hyperlane.json,\
+config/rpcs.json,\
+/etc/hyperlane/rpcs.json,\
+config/relayer.json,\
+$CREDENTIALS_DIRECTORY/relayer_secret.json"
+
 
 mkdir -p ~/.db/relayer
 
