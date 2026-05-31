@@ -141,16 +141,21 @@ jobs:
           cat proxy_config_env > $PROXY_DIR/.env
 
           mkdir -p $CONFIG_DIR
-          find . -type f -name '*.json' ! -name '*template.json' -exec cp {} $CONFIG_DIR \;
-
           mkdir -p $ETC_DIR
-          find . -type f -name '*template.json' -exec cp {} $ETC_DIR \;
 
-          mkdir $TOOLS_DIR
+          for f in *.json; do
+            if [[ "$f" == *template.json ]]; then
+              cp "$f" $ETC_DIR
+            else
+              cp "$f" $CONFIG_DIR
+            fi
+          done
+
+          mkdir -p $TOOLS_DIR
           cp ~/.foundry/bin/cast $TOOLS_DIR
           cp $KDA_TOOL_BIN $TOOLS_DIR
 
-          mkdir $SYSTEMD_DIR
+          mkdir -p $SYSTEMD_DIR
           cp systemd/* $SYSTEMD_DIR
 
       - name: Upload dist artifact
