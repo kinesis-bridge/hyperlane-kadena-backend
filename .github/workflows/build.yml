@@ -121,6 +121,7 @@ jobs:
           CONFIG_DIR=$DIST/config
           TOOLS_DIR=$DIST/tools
           SYSTEMD_DIR=$DIST/systemd
+          ETC_DIR=$DIST/systemd
 
           mkdir -p $AGENTS_DIR
           cp hyperlane/rust/target/release/relayer $AGENTS_DIR
@@ -140,7 +141,10 @@ jobs:
           cat proxy_config_env > $PROXY_DIR/.env
 
           mkdir -p $CONFIG_DIR
-          cp *.json $CONFIG_DIR
+          find . -type f -name '*.json' ! -name '*template.json' -exec cp {} $CONFIG_DIR \;
+
+          mkdir -p $ETC_DIR
+          find . -type f -name '*template.json' -exec cp {} $ETC_DIR \;
 
           mkdir $TOOLS_DIR
           cp ~/.foundry/bin/cast $TOOLS_DIR
@@ -202,15 +206,22 @@ jobs:
 
       - name: Checkout Repository
         uses:  actions/checkout@v6
+        with:
+          path: src
 
       - name: Prepare templates
         run: |
-          for f in *_template.yaml
-              do yq -o=json '.' "$f" > "release_artifacts/${f%.*}.json"
+          for f in src/*_template.yaml
+            do base=$(basename "${f%.*}")
+            yq -o=json '.' "$f" > "release_artifacts/${base}.json"
           done
+
+          yq -o=json '.' "src/rpcs.yaml" > "release_artifacts/rpcs.json"
+
+          cat src/validator.env > "release_artifacts/validator.env"
 
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "release_artifacts/*"
           body: "Kadena Systemd Package Release"
-          tag: inputs.release_tag
+          tag: ${{inputs.release_tag}}
