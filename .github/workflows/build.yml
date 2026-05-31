@@ -151,11 +151,11 @@ jobs:
             fi
           done
 
-          mkdir $TOOLS_DIR
+          mkdir -p $TOOLS_DIR
           cp ~/.foundry/bin/cast $TOOLS_DIR
           cp $KDA_TOOL_BIN $TOOLS_DIR
 
-          mkdir $SYSTEMD_DIR
+          mkdir -p $SYSTEMD_DIR
           cp systemd/* $SYSTEMD_DIR
 
       - name: Upload dist artifact
