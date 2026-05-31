@@ -121,6 +121,7 @@ jobs:
           CONFIG_DIR=$DIST/config
           TOOLS_DIR=$DIST/tools
           SYSTEMD_DIR=$DIST/systemd
+          ETC_DIR=$DIST/systemd
 
           mkdir -p $AGENTS_DIR
           cp hyperlane/rust/target/release/relayer $AGENTS_DIR
@@ -140,7 +141,10 @@ jobs:
           cat proxy_config_env > $PROXY_DIR/.env
 
           mkdir -p $CONFIG_DIR
-          cp *.json $CONFIG_DIR
+          find . -type f -name '*.json' ! -name '*template.json' -exec cp {} $CONFIG_DIR \;
+
+          mkdir -p $ETC_DIR
+          find . -type f -name '*template.json' -exec cp {} $ETC_DIR \;
 
           mkdir $TOOLS_DIR
           cp ~/.foundry/bin/cast $TOOLS_DIR
