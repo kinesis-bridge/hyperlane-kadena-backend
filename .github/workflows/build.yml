@@ -105,23 +105,16 @@ jobs:
           cd hyperlane/typescript/agents/kadena-proxy
           yarn run nest build --webpack
 
-
-      - name: Prepare configs
-        run: |
-          for f in *.yaml
-            do yq -o=json '.' "$f" > "${f%.*}.json"
-          done
-
-      - name: Prepare Full artifact
+      - name: Prepare Artifact
         run: |
           DIST=dist
           AGENTS_DIR=$DIST/agents
           KEYS_DIR=$DIST/keys
           PROXY_DIR=$DIST/proxy
-          CONFIG_DIR=$DIST/config
           TOOLS_DIR=$DIST/tools
           SYSTEMD_DIR=$DIST/systemd
-          ETC_DIR=$DIST/systemd
+          ETC_DIR=$DIST/etc
+          CONFIG_DIR=$DIST/config
 
           mkdir -p $AGENTS_DIR
           cp hyperlane/rust/target/release/relayer $AGENTS_DIR
@@ -140,16 +133,22 @@ jobs:
 
           cat proxy_config_env > $PROXY_DIR/.env
 
-          mkdir -p $CONFIG_DIR
           mkdir -p $ETC_DIR
+          mkdir -p $CONFIG_DIR
 
-          for f in *.json; do
-            if [[ "$f" == *template.json ]]; then
-              cp "$f" $ETC_DIR
-            else
-              cp "$f" $CONFIG_DIR
-            fi
+          yq eval-all 'select(fileIndex==0) * select(fileIndex==1)' kda_hyperlane.yaml kadena_validator.yaml -o=json > $CONFIG_DIR/kadena_validator.json
+          yq eval-all 'select(fileIndex==0) * select(fileIndex==1)' kda_hyperlane.yaml eth_validator.yaml -o=json > $CONFIG_DIR/eth_validator.json
+          yq eval-all 'select(fileIndex==0) * select(fileIndex==1)' kda_hyperlane.yaml relayer.yaml -o=json > $CONFIG_DIR/relayer.json
+
+
+          for f in *template.yaml; do
+            yq -o=json '.' "$f" > $ETC_DIR/"${f%.*}.json"
           done
+
+          yq -o=json '.' rpcs.yaml > $ETC_DIR/rpcs.json
+
+          cat proxy_config_env > $ETC_DIR/proxy_config.env
+
 
           mkdir -p $TOOLS_DIR
           cp ~/.foundry/bin/cast $TOOLS_DIR
@@ -158,39 +157,21 @@ jobs:
           mkdir -p $SYSTEMD_DIR
           cp systemd/* $SYSTEMD_DIR
 
+
       - name: Upload dist artifact
         uses: actions/upload-artifact@v7
         with:
           include-hidden-files: true
-          name: build-${{ matrix.os }}-${{github.sha}}
+          name: hyperlane-kadena-${{ matrix.os }}-${{github.sha}}
           path: dist/
-
-      - name: Prepare Systemd version
-        env:
-          MATRIX_OS: ${{ matrix.os }}
-        run: |
-          DIST=hyperlane_kadena_validator
-          cp -rf dist $DIST
-
-          ## Move the systemd scripts
-          mv $DIST/systemd/start*.sh $DIST
-
-          mkdir -p $DIST/systemd-units
-          mv $DIST/systemd/*.service $DIST/systemd-units
-
-          rm -rf $DIST/systemd
-
-          tar czf hyperlane_kadena_systemd_${MATRIX_OS}_${GITHUB_SHA}.tar.gz -C $DIST .
-
-      - name: Upload Systemd archive
-        uses: actions/upload-artifact@v7
-        with:
-          path: hyperlane_kadena_systemd_${{ matrix.os }}_${{github.sha}}.tar.gz
-          archive: false
 
   release:
     needs: build
     if: github.event_name == 'workflow_dispatch' && inputs.create_release == true
+
+    env:
+      BASE_ARCH: ubuntu-24.04
+      ARTIFACT_DIR: ${{ github.workspace }}/artifacts/hyperlane-kadena-${{inputs.release_tag}}
 
     runs-on: ubuntu-latest
     permissions:
@@ -199,34 +180,60 @@ jobs:
     steps:
       - name: Create artifacts dir
         run: |
-          mkdir -p release_artifacts
-
+          mkdir -p $ARTIFACT_DIR
+          mkdir -p release
 
       - name: Download Artifacts
         uses: actions/download-artifact@v8
         with:
-          pattern: hyperlane_kadena_systemd_*
-          merge-multiple: true
-          path: release_artifacts/
+          name: hyperlane-kadena-${{ env.BASE_ARCH }}-${{github.sha}}
+          path: ${{ env.ARTIFACT_DIR }}
 
-      - name: Checkout Repository
-        uses:  actions/checkout@v6
-        with:
-          path: src
 
-      - name: Prepare templates
+      - name: Prepare etc directory
         run: |
-          for f in src/*_template.yaml
-            do base=$(basename "${f%.*}")
-            yq -o=json '.' "$f" > "release_artifacts/${base}.json"
+          mkdir -p etc/hyperlane
+          cp $ARTIFACT_DIR/etc/* etc/hyperlane
+          tar czf etc-kadena-hyperlane.tar.gz etc
+
+      - name: Prepare main archive
+        run: |
+          mkdir -p hyperlane-kadena-${{inputs.release_tag}}
+          cp -rf $ARTIFACT_DIR/*  hyperlane-kadena-${{inputs.release_tag}}
+          tar czf hyperlane-kadena-${{inputs.release_tag}}.tar.gz hyperlane-kadena-${{inputs.release_tag}}
+
+      - name: Prepare release
+        working-directory: release
+        run: |
+          cp ../hyperlane-kadena-${{inputs.release_tag}}.tar.gz .
+          cp $ARTIFACT_DIR/agents/validator .
+          cp $ARTIFACT_DIR/agents/relayer .
+          cp ../etc-kadena-hyperlane.tar.gz .
+          cp $ARTIFACT_DIR/config/* .
+
+      - name: Compute Sha256
+        working-directory: release
+        run: |
+          sha256sum * > SHA256SUMS
+
+      - name: Prepare GPG Key
+        working-directory: release
+        run: |
+           echo "${{ secrets.GPG_PRIVATE_KEY}}" | gpg --batch --import
+
+
+      - name: Sign important files
+        working-directory: release
+        env:
+          FILES_TO_SIGN: validator relayer SHA256SUMS kadena_validator.json eth_validator.json
+        run: |
+          for f in $FILES_TO_SIGN
+            do echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --detach-sign --armor $f
           done
-
-          yq -o=json '.' "src/rpcs.yaml" > "release_artifacts/rpcs.json"
-
-          cat src/validator.env > "release_artifacts/validator.env"
 
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "release_artifacts/*"
+          artifacts: "release/*"
           body: "Kadena Systemd Package Release"
           tag: ${{inputs.release_tag}}
+          draft: true

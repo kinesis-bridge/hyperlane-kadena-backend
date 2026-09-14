@@ -5,8 +5,6 @@ chains:
     domain: 626
     chainId: 626
 
-    proxyUrl: http://localhost:3000
-
     namespace: n_e595727b657fbbb3b8e362a05a7bb8d12865c1ff
 
     # Hash of SC: computed with (compose hash (take 32) modref)
