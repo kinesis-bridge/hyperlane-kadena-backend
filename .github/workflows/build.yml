@@ -136,10 +136,7 @@ jobs:
           mkdir -p $ETC_DIR
           mkdir -p $CONFIG_DIR
 
-          yq eval-all 'select(fileIndex==0) * select(fileIndex==1)' kda_hyperlane.yaml kadena_validator.yaml -o=json > $CONFIG_DIR/kadena_validator.json
-          yq eval-all 'select(fileIndex==0) * select(fileIndex==1)' kda_hyperlane.yaml eth_validator.yaml -o=json > $CONFIG_DIR/eth_validator.json
-          yq eval-all 'select(fileIndex==0) * select(fileIndex==1)' kda_hyperlane.yaml relayer.yaml -o=json > $CONFIG_DIR/relayer.json
-
+          yq -o=json '.' kda_hyperlane.yaml  > $CONFIG_DIR/kda_hyperlane.json
 
           for f in *template.yaml; do
             yq -o=json '.' "$f" > $ETC_DIR/"${f%.*}.json"
@@ -226,7 +223,7 @@ jobs:
       - name: Sign important files
         working-directory: release
         env:
-          FILES_TO_SIGN: validator relayer SHA256SUMS kadena_validator.json eth_validator.json kadena_proxy.js
+          FILES_TO_SIGN: validator relayer SHA256SUMS kda_hyperlane.json kadena_proxy.js
         run: |
           for f in $FILES_TO_SIGN
             do echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --detach-sign --armor $f
