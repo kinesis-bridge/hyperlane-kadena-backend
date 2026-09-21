@@ -1,4 +1,4 @@
-name: Create a complete package for Hyperlane Backed
+name: Create a complete package for Hyperlane Backend
 on:
   push:
 
@@ -206,6 +206,7 @@ jobs:
         working-directory: release
         run: |
           cp ../hyperlane-kadena-${{inputs.release_tag}}.tar.gz .
+          cp $ARTIFACT_DIR/proxy/kadena_proxy.js .
           cp $ARTIFACT_DIR/agents/validator .
           cp $ARTIFACT_DIR/agents/relayer .
           cp ../etc-kadena-hyperlane.tar.gz .
@@ -225,7 +226,7 @@ jobs:
       - name: Sign important files
         working-directory: release
         env:
-          FILES_TO_SIGN: validator relayer SHA256SUMS kadena_validator.json eth_validator.json
+          FILES_TO_SIGN: validator relayer SHA256SUMS kadena_validator.json eth_validator.json kadena_proxy.js
         run: |
           for f in $FILES_TO_SIGN
             do echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --detach-sign --armor $f
