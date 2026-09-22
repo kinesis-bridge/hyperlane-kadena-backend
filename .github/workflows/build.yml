@@ -167,7 +167,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && inputs.create_release == true
 
     env:
-      BASE_ARCH: ubuntu-24.04
+      BASE_ARCH: ubuntu-22.04
       ARTIFACT_DIR: ${{ github.workspace }}/artifacts/hyperlane-kadena-${{inputs.release_tag}}
 
     runs-on: ubuntu-latest
