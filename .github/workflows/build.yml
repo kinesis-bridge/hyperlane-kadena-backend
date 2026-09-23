@@ -137,7 +137,9 @@ jobs:
           yq -o=json '.' kda_hyperlane.yaml  > $CONFIG_DIR/kda_hyperlane.json
 
           BLACKLIST=$(yq -o=json blacklist.yaml | jq -c .)
-          yq --arg bl "$BLACKLIST" '.blacklist = $bl' -o=json relayer.yaml > $CONFIG_DIR/relayer.json
+          export BLACKLIST
+
+          yq -o=json '.blacklist = strenv(BLACKLIST)' relayer.yaml > "$CONFIG_DIR/relayer.json"
 
           yq -o=json '.' validator.yaml > $CONFIG_DIR/validator.json
 
