@@ -77,7 +77,7 @@ with
 ```
 gpg --list-keys --no-default-keyring --keyring /etc/hyperlane/trustedkeys.kbx
 ```
-```
+
 Check Keys ID: ``6AF71D7A1F85CDA7B485A3B1CFD143179D222C71`` and ``650A1112C5C2D077B4794A6EB241B06C43FE4D30``
 
 
@@ -87,7 +87,6 @@ Fill eth_validator_secret_template.json and kadena_validator_secret_template.jso
 Fill aws_secret_template_env
 
 ```
-
 systemd-creds encrypt --name=aws_secret aws_secret_template_env /etc/hyperlane/aws_secret.env
 systemd-creds encrypt --name=eth_secret.json eth_validator_secret_template.json /etc/hyperlane/eth_secret
 systemd-creds encrypt --name=kadena_secret.json kadena_validator_secret_template.json /etc/hyperlane/kadena_secret
