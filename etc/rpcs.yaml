@@ -1,0 +1,8 @@
+chains:
+  ethereum:
+    rpcUrls:
+      - http: "https://ethereum-rpc.publicnode.com"
+      - http: "https://lb.drpc.live/ethereum/Aje7D9eXHUcytiP-yX9qol0btTMpTisR8aNwtiKh6MJI"
+  kadena:
+    rpcUrls:
+      - http: "https://api.chainweb-community.org/chainweb/0.0/mainnet01/chain/2/"

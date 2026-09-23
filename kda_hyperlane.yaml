@@ -13,7 +13,6 @@ chains:
     validatorAnnounce: "0x534932426c324a4b434f5f586368576b6f634358416b6c5763694538327a374a"
     merkleTreeHook: "0x6e54475f325533364136564852684a5579564b74454f32566f43416e46643851"
 
-    accountName: r:n_e595727b657fbbb3b8e362a05a7bb8d12865c1ff.validators
     proxyUrl: http://localhost:3000
 
     index:

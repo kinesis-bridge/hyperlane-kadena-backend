@@ -131,21 +131,24 @@ jobs:
           cp keys/kadena_relayers.yaml.gpg $KEYS_DIR
           cp keys/kadena_validators.yaml.gpg $KEYS_DIR
 
-          cat proxy_config_env > $PROXY_DIR/.env
-
           mkdir -p $ETC_DIR
           mkdir -p $CONFIG_DIR
 
           yq -o=json '.' kda_hyperlane.yaml  > $CONFIG_DIR/kda_hyperlane.json
 
-          for f in *template.yaml; do
+          BLACKLIST=$(yq -o=json blacklist.yaml | jq -c .)
+          yq --arg bl "$BLACKLIST" '.blacklist = $bl' -o=json relayer.yaml > $CONFIG_DIR/relayer.json
+
+          yq -o=json '.' validator.yaml > $CONFIG_DIR/validator.json
+
+          for f in etc/*template.yaml; do
             yq -o=json '.' "$f" > $ETC_DIR/"${f%.*}.json"
           done
 
-          yq -o=json '.' rpcs.yaml > $ETC_DIR/rpcs.json
+          yq -o=json '.' etc/rpcs.yaml > $ETC_DIR/rpcs.json
 
-          cat proxy_config_env > $ETC_DIR/proxy_config.env
-
+          cp etc/validator.env > $ETC_DIR
+          cp etc/aws_secret.env.template > $ETC_DIR
 
           mkdir -p $TOOLS_DIR
           cp ~/.foundry/bin/cast $TOOLS_DIR
@@ -225,6 +228,7 @@ jobs:
         env:
           FILES_TO_SIGN: validator relayer SHA256SUMS kda_hyperlane.json kadena_proxy.js
         run: |
+          # We don't sign relayer.json, and validator.json as they are not critical file and may be be changed locally by the relayer
           for f in $FILES_TO_SIGN
             do echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --detach-sign --armor $f
           done
