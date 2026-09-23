@@ -107,7 +107,7 @@ jobs:
 
       - name: Prepare Artifact
         run: |
-          DIST=dist
+          DIST=$GITHUB_WORKSPACE/dist
           AGENTS_DIR=$DIST/agents
           KEYS_DIR=$DIST/keys
           PROXY_DIR=$DIST/proxy
@@ -143,14 +143,17 @@ jobs:
 
           yq -o=json '.' validator.yaml > $CONFIG_DIR/validator.json
 
-          for f in etc/*template.yaml; do
+          cd etc
+          for f in *template.yaml; do
             yq -o=json '.' "$f" > $ETC_DIR/"${f%.*}.json"
           done
 
           yq -o=json '.' etc/rpcs.yaml > $ETC_DIR/rpcs.json
 
-          cp etc/validator.env > $ETC_DIR
-          cp etc/aws_secret.env.template > $ETC_DIR
+          cp validator.env > $ETC_DIR
+          cp aws_secret.env.template > $ETC_DIR
+          cd ..
+
 
           mkdir -p $TOOLS_DIR
           cp ~/.foundry/bin/cast $TOOLS_DIR
@@ -214,7 +217,7 @@ jobs:
           cp ../etc-kadena-hyperlane.tar.gz .
           cp $ARTIFACT_DIR/config/* .
 
-      - name: Compute Sha256
+      - name: Compute SHA256
         working-directory: release
         run: |
           sha256sum * > SHA256SUMS
