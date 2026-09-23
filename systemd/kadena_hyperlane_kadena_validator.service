@@ -7,15 +7,40 @@ StartLimitIntervalSec=0
 User=validator
 KillMode=process
 KillSignal=SIGINT
-WorkingDirectory=~
 
 EnvironmentFile=/etc/hyperlane/validator.env
 LoadCredentialEncrypted=kadena_secret.json:/etc/hyperlane/kadena_secret
-LoadCredentialEncrypted=aws_secret:/etc/hyperlane/aws_secret
+LoadCredentialEncrypted=aws_secret:/etc/hyperlane/aws_secret.env
 
-ExecStart=/bin/bash start_systemd_kadena_validator.sh
-Restart=always
-RestartSec=30
+RuntimeDirectory=%N
+CacheDirectory=%N
+StateDirectory=%N
+WorkingDirectory=%C/%N
+
+Environment=GNUPGHOME=/etc/hyperlane
+Environment=CONFIG_FILES="%C/%N/kda_hyperlane.json,%C/%N/validator.json,/etc/hyperlane/rpcs.json,%d/kadena_secret.json"
+Environment=HYP_METRICSPORT=9092
+Environment=HYP_INTERVAL=30
+Environment=HYP_ORIGINCHAINNAME=kadena
+Environment=BASE_DB=%S/%N/db
+
+ExecStartPre=wget -N -q https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/validator \
+                        https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/validator.asc \
+                        https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/kda_hyperlane.json \
+                        https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/kda_hyperlane.json.asc \
+                        https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/validator.json
+
+ExecStartPre=bash -c 'gpgv --status-fd 1 validator.asc validator | grep "VALIDSIG 6AF71D7A1F85CDA7B485A3B1CFD143179D222C71"'
+ExecStartPre=bash -c 'gpgv --status-fd 1 kda_hyperlane.json.asc kda_hyperlane.json | grep "VALIDSIG 6AF71D7A1F85CDA7B485A3B1CFD143179D222C71"'
+ExecStartPre=bash -c 'gpgv --status-fd 1 validator.asc validator | grep "VALIDSIG 650A1112C5C2D077B4794A6EB241B06C43FE4D30"'
+ExecStartPre=bash -c 'gpgv --status-fd 1 kda_hyperlane.json.asc kda_hyperlane.json | grep "VALIDSIG 650A1112C5C2D077B4794A6EB241B06C43FE4D30"'
+
+ExecStartPre=bash -c 'mkdir -p ${BASE_DB}/${VALIDATOR_NAME}'
+ExecStartPre=mkdir -p config
+ExecStartPre=chmod u+x validator
+
+ExecStart=bash -c 'set -a; source "$CREDENTIALS_DIRECTORY"/aws_secret; set +a; \
+                   exec ./validator --db ${BASE_DB}/${VALIDATOR_NAME} --checkpointSyncer.folder sigs-$VALIDATOR_NAME-kadena'
 
 [Install]
 WantedBy=multi-user.target

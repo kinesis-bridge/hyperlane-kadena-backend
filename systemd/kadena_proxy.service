@@ -4,12 +4,34 @@ After=network.target
 StartLimitIntervalSec=0
 
 [Service]
+Environment=GNUPGHOME=/etc/hyperlane
+Environment=LOG_LEVEL=debug,info,error,warn,fatal
+Environment=CONT_CONFIRMATION_DEPTH=6
+Environment=POLL_TIMEOUT=600000
+Environment=POLL_INTERVAL=10000
+Environment=KADENA_GAS_STATION_MODULE_NAME=n_9b079bebc8a0d688e4b2f4279a114148d6760edf.kinesis-gas-station
+Environment=GAS_STATION_GAS_LIMIT=3000
+Environment=GAS_STATION_GAS_PRICE=0.00000001
+Environment=GAS_STATION_PAYER=u:n_9b079bebc8a0d688e4b2f4279a114148d6760edf.kinesis-gas-station.gas-payer-guard:DldRwCblQ7Loqy6wYJnaodHl30d3j3eH-qtFzfEv46g
+
+RuntimeDirectory=%N
+RuntimeDirectoryMode=700
+
+WorkingDirectory=%t/%N
+
 User=validator
 KillMode=process
 KillSignal=SIGINT
-Nice=19
-WorkingDirectory=~
-ExecStart=bash -c "cd ~/proxy && node kadena_proxy.js"
+
+ExecStartPre=wget -q https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/kadena_proxy.js \
+                     https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/kadena_proxy.js.asc
+
+ExecStartPre=bash -c 'gpgv --status-fd 1 kadena_proxy.js.asc kadena_proxy.js | grep "VALIDSIG 6AF71D7A1F85CDA7B485A3B1CFD143179D222C71"'
+ExecStartPre=bash -c 'gpgv --status-fd 1 kadena_proxy.js.asc kadena_proxy.js | grep "VALIDSIG 650A1112C5C2D077B4794A6EB241B06C43FE4D30"'
+
+
+650A1112C5C2D077B4794A6EB241B06C43FE4D30
+ExecStart=node kadena_proxy.js
 Restart=always
 RestartSec=30
 

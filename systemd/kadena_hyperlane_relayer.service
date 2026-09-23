@@ -2,18 +2,43 @@
 Description=Kadena Hyperlane Relayer Service
 After=network.target
 StartLimitIntervalSec=0
+Wants=kadena_proxy.service
 
 [Service]
-Wants=kadena_proxy.service
 User=validator
 KillMode=process
 KillSignal=SIGINT
-WorkingDirectory=~
+
+CacheDirectory=%N
+StateDirectory=%N
+WorkingDirectory=%C/%N
+
 
 LoadCredentialEncrypted=relayer_secret.json:/etc/hyperlane/relayer_secret
-LoadCredentialEncrypted=aws_secret:/etc/hyperlane/aws_secret
+LoadCredentialEncrypted=aws_secret:/etc/hyperlane/aws_secret.env
 
-ExecStart=/bin/bash start_systemd_relayer.sh
+Environment=GNUPGHOME=/etc/hyperlane
+Environment=CONFIG_FILES="%C/%N/kda_hyperlane.json,%C/%N/relayer.json,/etc/hyperlane/rpcs.json,%d/relayer_secret.json"
+Environment=HYP_DB=%S/%N/db
+Environment=HYP_METRICSPORT=9093
+Environment=HYP_RELAYCHAINS=ethereum,kadena
+
+ExecStartPre=wget -N -q https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/relayer \
+                        https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/relayer.asc \
+                        https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/kda_hyperlane.json \
+                        https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/kda_hyperlane.json.asc \
+                        https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/relayer.json
+
+ExecStartPre=bash -c 'gpgv --status-fd 1 relayer.asc relayer | grep "VALIDSIG 6AF71D7A1F85CDA7B485A3B1CFD143179D222C71"'
+ExecStartPre=bash -c 'gpgv --status-fd 1 kda_hyperlane.json.asc kda_hyperlane.json | grep "VALIDSIG 6AF71D7A1F85CDA7B485A3B1CFD143179D222C71"'
+ExecStartPre=bash -c 'gpgv --status-fd 1 relayer.asc relayer | grep "VALIDSIG 650A1112C5C2D077B4794A6EB241B06C43FE4D30"'
+ExecStartPre=bash -c 'gpgv --status-fd 1 kda_hyperlane.json.asc kda_hyperlane.json | grep "VALIDSIG 650A1112C5C2D077B4794A6EB241B06C43FE4D30"'
+
+ExecStartPre=mkdir -p $HYP_DB
+ExecStartPre=mkdir -p config
+ExecStartPre=chmod u+x relayer
+
+ExecStart=bash -c 'set -a; source "$CREDENTIALS_DIRECTORY"/aws_secret; set +a; exec ./relayer'
 Restart=always
 RestartSec=30
 

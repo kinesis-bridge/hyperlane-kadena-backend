@@ -201,6 +201,12 @@ jobs:
           cp $ARTIFACT_DIR/etc/* etc/hyperlane
           tar czf etc-kadena-hyperlane.tar.gz etc
 
+      - name: Prepare Systemd directory
+        run: |
+          mkdir -p etc/systemd/system
+          cp $ARTIFACT_DIR/systemd/* etc/systemd/system
+          tar czf systemd-kadena-hyperlane.tar.gz etc
+
       - name: Prepare main archive
         run: |
           mkdir -p hyperlane-kadena-${{inputs.release_tag}}
@@ -215,6 +221,7 @@ jobs:
           cp $ARTIFACT_DIR/agents/validator .
           cp $ARTIFACT_DIR/agents/relayer .
           cp ../etc-kadena-hyperlane.tar.gz .
+          cp ../systemd-kadena-hyperlane.tar.gz .
           cp $ARTIFACT_DIR/config/* .
 
       - name: Compute SHA256
