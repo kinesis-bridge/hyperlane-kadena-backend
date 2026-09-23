@@ -148,7 +148,7 @@ jobs:
             yq -o=json '.' "$f" > $ETC_DIR/"${f%.*}.json"
           done
 
-          yq -o=json '.' etc/rpcs.yaml > $ETC_DIR/rpcs.json
+          yq -o=json '.' rpcs.yaml > $ETC_DIR/rpcs.json
 
           cp validator.env > $ETC_DIR
           cp aws_secret.env.template > $ETC_DIR
