@@ -150,8 +150,8 @@ jobs:
 
           yq -o=json '.' rpcs.yaml > $ETC_DIR/rpcs.json
 
-          cp validator.env > $ETC_DIR
-          cp aws_secret.env.template > $ETC_DIR
+          cp validator.env $ETC_DIR
+          cp aws_secret.env.template $ETC_DIR
           cd ..
 
 
