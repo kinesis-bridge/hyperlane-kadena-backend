@@ -197,12 +197,14 @@ jobs:
 
       - name: Prepare etc directory
         run: |
+          rm -rf etc
           mkdir -p etc/hyperlane
           cp $ARTIFACT_DIR/etc/* etc/hyperlane
           tar czf etc-kadena-hyperlane.tar.gz etc
 
       - name: Prepare Systemd directory
         run: |
+          rm -rf etc
           mkdir -p etc/systemd/system
           cp $ARTIFACT_DIR/systemd/* etc/systemd/system
           tar czf systemd-kadena-hyperlane.tar.gz etc
