@@ -106,7 +106,10 @@ VALIDATOR_NAME=my_validator
 
 7 - Create /etc/hyperlane/rpcs.json
 
-8 - Launch the services... starting with kadena_proxy
+8 - Create teh user validator (services are run under by an unpriviligied user.)
+
+
+9 - Launch the services... starting with kadena_proxy
 
 
 ## For a Relayer
