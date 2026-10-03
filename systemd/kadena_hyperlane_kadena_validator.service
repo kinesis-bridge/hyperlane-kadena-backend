@@ -24,6 +24,8 @@ Environment=HYP_INTERVAL=30
 Environment=HYP_ORIGINCHAINNAME=kadena
 Environment=BASE_DB=%S/%N/db
 
+ExecStartPre=bash -c ': "${VALIDATOR_NAME:?VALIDATOR_NAME is not set}"'
+
 ExecStartPre=wget -N -q https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/validator \
                         https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/validator.asc \
                         https://github.com/kinesis-bridge/hyperlane-kadena-backend/releases/latest/download/kda_hyperlane.json \
