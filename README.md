@@ -126,7 +126,7 @@ Fill relayer_secret_template.json
 
 ```
 mkdir -p /etc/hyperlane/
-systemd-creds encrypt --name=aws_secret aws_secret_template_env /etc/hyperlane/aws_secret.env
+systemd-creds encrypt --name=aws_secret aws_secret.env.template /etc/hyperlane/aws_secret.env
 systemd-creds encrypt --name=eth_secret.json relayer_secret_template /etc/hyperlane/eth_secret
 shred -u aws_secret_template_env relayer_secret_template.json
 ```
