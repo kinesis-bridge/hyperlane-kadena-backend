@@ -44,5 +44,8 @@ ExecStartPre=chmod u+x validator
 ExecStart=bash -c 'set -a; source "$CREDENTIALS_DIRECTORY"/aws_secret; set +a; \
                    exec ./validator --db ${BASE_DB}/${VALIDATOR_NAME} --checkpointSyncer.folder sigs-$VALIDATOR_NAME-kadena'
 
+Restart=always
+RestartSec=120
+
 [Install]
 WantedBy=multi-user.target
