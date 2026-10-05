@@ -5,7 +5,7 @@ Kinesis Bridge release scripts for backend
 
 ## For a validator
 
-Instuctions:
+Instructions:
 
 Make sure you have nodejs and jq installed:
 ```
@@ -26,7 +26,12 @@ or
 
 https://github.com/iancoleman/bip39
 
-3 - Install GPG Public Keys
+3 - Make sure /etc/hyperlane exists
+```
+mkdir -p /etc/hyperlane
+```
+
+4 - Install GPG Public Keys
 
 ```
 gpg --no-default-keyring --keyring /etc/hyperlane/trustedkeys.kbx --import << EOF
@@ -81,7 +86,7 @@ gpg --list-keys --no-default-keyring --keyring /etc/hyperlane/trustedkeys.kbx
 Check Keys ID: ``6AF71D7A1F85CDA7B485A3B1CFD143179D222C71`` and ``650A1112C5C2D077B4794A6EB241B06C43FE4D30``
 
 
-4 - Pepare the secrets
+5 - Prepare the secrets
 
 Fill eth_validator_secret_template.json and kadena_validator_secret_template.json
 Fill aws_secret_template_env
@@ -93,28 +98,25 @@ systemd-creds encrypt --name=kadena_secret.json kadena_validator_secret_template
 shred -u aws_secret_template_env eth_validator_secret_template.json kadena_validator_secret_template.json
 ```
 
-5 - Copy the Unit files into /etc/systemd/system/
+6 - Copy the Unit files into /etc/systemd/system/
 - kadena_hyperlane_eth_validator.service
 - kadena_hyperlane_kadena_validator.service
 - kadena_proxy.service
 
-6 - Create /etc/hyperlane/validator.env
+7 - Create /etc/hyperlane/validator.env
 ```
 ## Validator name
 VALIDATOR_NAME=my_validator
 ```
 
-7 - Create /etc/hyperlane/rpcs.json
-
-8 - Create teh user validator (services are run under by an unpriviligied user.)
-
+8 - Create /etc/hyperlane/rpcs.json
 
 9 - Launch the services... starting with kadena_proxy
 
 
 ## For a Relayer
 
-Instuctions:
+Instructions:
 
 Make sure you have nodejs and jq installed:
 ```
@@ -129,7 +131,7 @@ Fill relayer_secret_template.json
 
 ```
 mkdir -p /etc/hyperlane/
-systemd-creds encrypt --name=aws_secret aws_secret_template_env /etc/hyperlane/aws_secret.env
+systemd-creds encrypt --name=aws_secret aws_secret.env.template /etc/hyperlane/aws_secret.env
 systemd-creds encrypt --name=eth_secret.json relayer_secret_template /etc/hyperlane/eth_secret
 shred -u aws_secret_template_env relayer_secret_template.json
 ```
