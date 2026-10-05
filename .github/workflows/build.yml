@@ -27,6 +27,9 @@ jobs:
     env:
       KDA_TOOL_VERSION: 1.2
 
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -143,17 +146,16 @@ jobs:
 
           yq -o=json '.' validator.yaml > $CONFIG_DIR/validator.json
 
-          cd etc
+          cd etc-yaml
           for f in *template.yaml; do
-            yq -o=json '.' "$f" > $ETC_DIR/"${f%.*}.json"
+            yq -o=json '.' "$f" > ../etc/"${f%.*}.json"
           done
 
-          yq -o=json '.' rpcs.yaml > $ETC_DIR/rpcs.json
+          yq -o=json '.' rpcs.yaml > ../etc/rpcs.json
 
-          cp validator.env $ETC_DIR
-          cp aws_secret.env.template $ETC_DIR
           cd ..
 
+          cp etc/* $ETC_DIR
 
           mkdir -p $TOOLS_DIR
           cp ~/.foundry/bin/cast $TOOLS_DIR
@@ -162,6 +164,16 @@ jobs:
           mkdir -p $SYSTEMD_DIR
           cp systemd/* $SYSTEMD_DIR
 
+      - name: Commit changes
+        if: matrix.os == 'ubuntu-24.04'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add etc/
+
+          git diff --cached --quiet || git commit -m "Update generated files"
+          git push
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v7
